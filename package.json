@@ -11,7 +11,8 @@
     "check": "tsc --noEmit",
     "start": "node dist/index.js",
     "dev": "node src/index.ts",
-    "agent1": "node src/agent1.ts"
+    "agent1": "node src/agent1.ts",
+    "agent2": "node src/agent2.ts"
   },
   "dependencies": {
     "@langchain/anthropic": "^1.6.0",
