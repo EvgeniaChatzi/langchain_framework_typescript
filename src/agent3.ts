@@ -1,9 +1,10 @@
 import { loadEnvFile } from "node:process";
-import { ChatAnthropic } from "@langchain/anthropic";
-import { createAgent, tool } from "langchain";
+import { MemorySaver } from "@langchain/langgraph-checkpoint";
+import { createAgent, initChatModel, tool } from "langchain";
 import * as z from "zod";
 
 const config = {
+  configurable: { thread_id: "weather-demo" },
   context: { user_id: "user_id" },
 };
 
@@ -58,9 +59,18 @@ const getWeatherForLocation = tool(
   },
 );
 
+const model = await initChatModel("claude-haiku-4-5", {
+  modelProvider: "anthropic",
+  apiKey,
+  temperature: 0.7,
+  maxTokens: 1024,
+  clientOptions: { timeout: 30000 },
+});
+
 const agent = createAgent({
-  model: new ChatAnthropic({ apiKey, model: "claude-sonnet-5" }),
+  model,
   tools: [getWeatherForLocation, getUserLocation],
+  checkpointer: new MemorySaver(),
   systemPrompt,
   contextSchema: z.object({ user_id: z.string() }),
   responseFormat,
